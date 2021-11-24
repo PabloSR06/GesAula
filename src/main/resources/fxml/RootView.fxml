@@ -19,6 +19,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
 <BorderPane fx:id="RootView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
    <top>
@@ -175,9 +176,13 @@
                               </HBox>
                            </bottom>
                         </BorderPane>
-                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                        <BorderPane fx:id="alumnoPane" prefHeight="200.0" prefWidth="200.0">
                            <center>
-                              <Label text="Seleccione un alumno en la tabla de la izquierda" BorderPane.alignment="CENTER" />
+                              <VBox fx:id="infoPane" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <Label text="Seleccione un alumno en la tabla de la izquierda" />
+                                 </children>
+                              </VBox>
                            </center>
                         </BorderPane>
                     </items>

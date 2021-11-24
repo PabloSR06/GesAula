@@ -4,32 +4,28 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.Formatter;
 import java.util.ResourceBundle;
-import java.util.logging.SimpleFormatter;
-
-import javax.xml.stream.events.StartDocument;
 
 import dad.gesaula.alumnoController.AlumnoController;
 import dad.gesaula.main.GesAulaApp;
-import dad.gesaula.main.Main;
+
 import dad.gesaula.ui.model.Alumno;
 import dad.gesaula.ui.model.Grupo;
 import dad.gesaula.ui.model.Pesos;
-import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -37,6 +33,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 
 public class MainController implements Initializable {
 
@@ -44,6 +41,11 @@ public class MainController implements Initializable {
 	private MainModel model;
 
 	private Grupo grupo;
+	
+	//controller
+	
+	private AlumnoController AlumnoController;
+
 
 	// tabla
 
@@ -108,6 +110,12 @@ public class MainController implements Initializable {
 
 	@FXML
 	private Button saveButton;
+	
+	@FXML
+	private BorderPane alumnoPane;
+	
+	@FXML
+	private VBox infoPane;
 
 	public MainController() throws IOException {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/RootView.fxml"));
@@ -148,22 +156,32 @@ public class MainController implements Initializable {
 		surnameColumn.setCellValueFactory(v -> v.getValue().apellidosProperty());
 		dateColumn.setCellValueFactory(v -> v.getValue().fechaNacimientoProperty());
 		
+		
+		//alumno
+		AlumnoController = new AlumnoController();
+		deleteAlumnoButton.setDisable(true);
+		
+		this.seleccionado.addListener((observable, oldValue, newValue) -> {
+			if (newValue == null) {
+				this.alumnoPane.setCenter(infoPane);
+				deleteAlumnoButton.setDisable(true);
+			} else {
+				this.AlumnoController.setAlumno(newValue);
+				this.alumnoPane.setCenter(this.AlumnoController.getView());
+				deleteAlumnoButton.setDisable(false);
+			}
+		});
+		
+		
+		
 
 	}
 
-	
 
 	@FXML
 	void onNewAction(ActionEvent event) {
-		//grupo = new Grupo();
-
-		//seleccionado;
-		AlumnoController controller = new AlumnoController();
-		controller.showOnStage(GesAulaApp.getPrimaryStage());
-		
-		Alumno alumno = new Alumno();
-		alumno.setNombre("nuevo");
-		//pruebas para pantalla dividida
+		grupo = new Grupo();
+		System.out.println(seleccionado.toString());
 	}
 
 	@FXML
@@ -176,9 +194,14 @@ public class MainController implements Initializable {
 	
 	@FXML
 	void onDeleteAlumnoAction(ActionEvent event) {
-		System.out.println();
-		tabla.remove(seleccionado.getValue());
+		
+		
 		//TODO CONFIRMACION
+		
+		if (GesAulaApp.confirm(seleccionado.getValue().toString()) == true) {
+			tabla.remove(seleccionado.getValue());
+		}
+		
 	}
 
 	@FXML
@@ -193,6 +216,8 @@ public class MainController implements Initializable {
 			grupo.setIniCurso(model.startDatePropertyProperty().getValue());
 			grupo.setFinCurso(model.endDatePropertyProperty().getValue());
 			grupo.setPesos(pesos);
+			
+			grupo.setAlumnos(tabla);
 
 			grupo.save(new File(model.getNameGroupProperty()));
 
